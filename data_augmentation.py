@@ -74,3 +74,47 @@ def randomInsert(text, n):
         index = index + 1
 
     return " ".join(augmented_tokenized_text)
+
+
+# Get synonyms of a given word in input
+def getSynonyms(word):
+
+    synonyms = []
+
+    for syn in wordnet.synsets(word):
+        for lemma in syn.lemmas():
+            synonyms.append(lemma.name())
+
+    return synonyms
+
+
+# Function which creates n augmented observations using the Synonym Replacement technique 
+def synonymReplacement(text, n):
+
+    words = text.split()
+    augmented_obs = []
+
+    # Create n augmented observations
+    for _ in range(n):
+
+        augmented_words = []
+
+        # For each word of the text
+        for word in words:
+
+            # Get sysnonyms of the word
+            synonyms = getSynonyms(word)
+
+            # If there is at least one synonym, then add it to the augmented observation
+            if synonyms:
+                augmented_words.append(random.choice(synonyms))
+            else:
+                augmented_words.append(word)
+
+        # Manage the synonyms with _ instead of space between words
+        augmented_text = ' '.join(augmented_words)
+        augmented_text = augmented_text.replace('_', ' ')
+
+        augmented_obs.append(augmented_text)
+
+    return augmented_obs
