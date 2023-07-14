@@ -33,7 +33,7 @@ def kfoldCrossValidation(k_folds, feature, label, network, hyperparams):
         )
 
         # Converting to numpy for splitting
-        feature = feature.numpy()
+        feature = np.array(feature)
 
         # Splitting in training and validation set
         for train, val in stratified_kfold.split(feature, label):
