@@ -45,11 +45,13 @@ def kfoldCrossValidation(k_folds, feature, label, network, hyperparams, epochs):
 
             # Training (fit Neural Network)
             training_history = neural_network.fit(
+
                 x = feature_train,
                 y = label[train],
                 batch_size = hyperparams_combination['batch_size'],
                 epochs = epochs,
                 callbacks = [early_stopping]
+
             )
 
             # Best number of epochs
@@ -66,6 +68,7 @@ def kfoldCrossValidation(k_folds, feature, label, network, hyperparams, epochs):
 
         # KFold CV results for hyperparams combination
         results.append({
+
             'Network': neural_network.name,
             'Embedding': neural_network.layers[1].name,
             'k_folds': k_folds,
@@ -78,6 +81,7 @@ def kfoldCrossValidation(k_folds, feature, label, network, hyperparams, epochs):
             'accuracy_kfold': round(np.mean(accuracy_kfold), 3),
             'best_number_epochs': np.min(best_epochs),
             'n_epochs': epochs
+
         })
 
     return results
