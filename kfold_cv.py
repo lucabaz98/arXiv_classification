@@ -3,8 +3,10 @@ from iterstrat.ml_stratifiers import MultilabelStratifiedKFold
 import tensorflow
 import numpy as np
 
+early_stopping = tensorflow.keras.callbacks.EarlyStopping(monitor='loss', patience=3)
+
 # Function which performs the K-Fold Cross Validation
-def kfoldCrossValidation(k_folds, feature, label, network, hyperparams):
+def kfoldCrossValidation(k_folds, feature, label, network, hyperparams, epochs):
 
     neural_network = tensorflow.keras.models.clone_model(network)
 
@@ -43,10 +45,11 @@ def kfoldCrossValidation(k_folds, feature, label, network, hyperparams):
 
             # Training (fit Neural Network)
             training_history = neural_network.fit(
-                x = feature_train, 
-                y = label[train], 
-                batch_size = hyperparams_combination['batch_size'], 
-                epochs = 1
+                x = feature_train,
+                y = label[train],
+                batch_size = hyperparams_combination['batch_size'],
+                epochs = epochs,
+                callbacks = [early_stopping]
             )
 
             # Best number of epochs
@@ -63,9 +66,18 @@ def kfoldCrossValidation(k_folds, feature, label, network, hyperparams):
 
         # KFold CV results for hyperparams combination
         results.append({
+            'Network': neural_network.name,
+            'Embedding': neural_network.layers[1].name,
+            'k_folds': k_folds,
+            'filters': hyperparams_combination['filters'],
+            'kernel_size': hyperparams_combination['kernel_size'],
+            'rate': hyperparams_combination['rate'],
+            'optimizer': hyperparams_combination['optimizer'],
+            'batch_size': hyperparams_combination['batch_size'],
             'loss_kfold': round(np.mean(loss_kfold), 3),
             'accuracy_kfold': round(np.mean(accuracy_kfold), 3),
-            'best_number_epochs': np.min(best_epochs)
+            'best_number_epochs': np.min(best_epochs),
+            'n_epochs': epochs
         })
 
     return results

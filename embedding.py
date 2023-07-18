@@ -5,7 +5,7 @@ from keras.layers import Embedding
 from keras.initializers import Constant
 
 # Reading the GloVe words embedding (pre-trained model)
-with open('../glove-embedding.pkl', 'rb') as file:
+with open('data/glove-embedding.pkl', 'rb') as file:
     glove_embedding = pickle.load(file)
 
 
@@ -47,6 +47,7 @@ def buildingEmbeddingMatrixWord2Vec(embedding_dim, vocabulary, vocabulary_embedd
 def createEmbeddingLayer(embedding_matrix, regularizer):
 
     return Embedding(
+        
         embedding_matrix.shape[0], embedding_matrix.shape[1],
         embeddings_initializer = Constant(embedding_matrix), embeddings_regularizer = regularizer,
         trainable = False
