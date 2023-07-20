@@ -1,15 +1,17 @@
 
 from iterstrat.ml_stratifiers import MultilabelStratifiedKFold
+from keras.backend import clear_session
 import tensorflow
 import numpy as np
 
-early_stopping = tensorflow.keras.callbacks.EarlyStopping(monitor='loss', patience=3)
-
 # Function which performs the K-Fold Cross Validation
-def kfoldCrossValidation(k_folds, feature, label, network, hyperparams_combination, epochs):
+def kfoldCrossValidation(k_folds, feature, label, network, network_info, epochs):
 
     # Stratified K-fold Cross Validation
     stratified_kfold = MultilabelStratifiedKFold(n_splits = k_folds, random_state = 19, shuffle = True)
+
+    # Early stopping object
+    early_stopping = tensorflow.keras.callbacks.EarlyStopping(monitor = 'loss', patience = 3)
     
     # Lists with performance metrics for each iteration
     accuracy_kfold = []
@@ -17,16 +19,15 @@ def kfoldCrossValidation(k_folds, feature, label, network, hyperparams_combinati
     epochs_kfold = []
 
     # Compiling the network
-    network.compile(
-        loss = 'categorical_crossentropy', 
-        optimizer = hyperparams_combination['optimizer'], 
-        metrics = ['accuracy']
-    )
+    network.compile(loss = 'categorical_crossentropy', optimizer = 'adam', metrics = ['accuracy'])
 
     # Converting to numpy for splitting
     feature = np.array(feature)
 
     k = 0
+
+    # Initial weights
+    starting_weights = network.get_weights()
 
     # Splitting in training and validation set
     for train, val in stratified_kfold.split(feature, label):
@@ -37,12 +38,15 @@ def kfoldCrossValidation(k_folds, feature, label, network, hyperparams_combinati
         feature_train = tensorflow.convert_to_tensor(feature[train])
         feature_val = tensorflow.convert_to_tensor(feature[val])
 
+        # Reset the network weights (starting from scratch)
+        network.set_weights(starting_weights)
+
         # Training (fit Neural Network)
         training_history = network.fit(
 
             x = feature_train,
             y = label[train],
-            batch_size = hyperparams_combination['batch_size'],
+            batch_size = 512,
             epochs = epochs,
             callbacks = [ early_stopping ],
             verbose = 0
@@ -61,19 +65,13 @@ def kfoldCrossValidation(k_folds, feature, label, network, hyperparams_combinati
         accuracy_kfold.append(score[1])
         epochs_kfold.append(best_epochs)
 
-    return {
+    # New information after K-Fold CV
+    network_info['k_folds'] = 3
+    network_info['best_number_epochs'] = round(np.mean(epochs_kfold), 0)
+    network_info['optimizer'] = 'adam'
+    network_info['rate'] = 0.5
+    network_info['batch_size'] = 512
+    network_info['loss'] = round(np.mean(loss_kfold), 3)
+    network_info['accuracy'] = round(np.mean(accuracy_kfold), 3)
 
-        'Network': network.name,
-        'Embedding': network.layers[1].name,
-        'k_folds': k_folds,
-        'filters': hyperparams_combination['filters'],
-        'kernel_size': hyperparams_combination['kernel_size'],
-        'rate': hyperparams_combination['rate'],
-        'optimizer': hyperparams_combination['optimizer'],
-        'batch_size': hyperparams_combination['batch_size'],
-        'loss_kfold': round(np.mean(loss_kfold), 3),
-        'accuracy_kfold': round(np.mean(accuracy_kfold), 3),
-        'best_number_epochs': np.min(epochs_kfold),
-        'n_epochs': epochs
-
-    }
+    return network_info
