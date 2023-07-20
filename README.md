@@ -6,11 +6,11 @@ Classification of arXiv's articles
 
 
 Description:
-- data: Contains all file we have used during the project
+- data: this folder contains all CSV data files that we have used during the project
 - results:  
-    - data: Models results from the kfold and the best trained models
-    - models: The best models with the hyperparams obtained from the kfold
+    - data: this folder contatins the results obtained with the K-Fold Cross Validation applied on different neural network architectures and also a global results
+    - models: this folder contains the best trained models for each type of neural network, with the hyperparams obtained from the K-Fold CV process
 - src: 
-    - data: Notebooks used to retrieve and prepare data
-    - models: Notebooks used to search the best model
-    - utils: Package useful for the project
+    - data: Python notebooks with the code to retrieve and prepare the data before apply the deep learning techniques
+    - models: Python notebooks with the different types of neural network architectures tried in our project
+    - utils: our developed Python module, containing usefyl functions
