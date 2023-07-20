@@ -5,7 +5,7 @@ from keras.layers import Embedding
 from keras.initializers import Constant
 
 # Reading the GloVe words embedding (pre-trained model)
-with open('/content/drive/MyDrive/FDL Project/Code/data/glove-embedding.pkl', 'rb') as file:
+with open('../data/glove-embedding.pkl', 'rb') as file:
     glove_embedding = pickle.load(file)
 
 
