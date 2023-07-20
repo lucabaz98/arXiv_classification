@@ -1,5 +1,7 @@
 
 import re
+import nltk
+#nltk.data.path.append('C:\\Users\\della\\anaconda3\\nltk-data')
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
